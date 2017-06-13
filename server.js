@@ -1,10 +1,25 @@
 const express = require('express');
-const app = express();
+const http = require('http');
+const socket = require('socket.io');
+const path = require('path');
 
-app.get('/', function (req, res) {
-    res.send('Hello World!')
+const app = express();
+const server = http.Server(app);
+const io = socket(server);
+
+server.listen(3000);
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './index.html'));
 });
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!')
+io.on('connection', socket => {
+    console.log('Новое соеденение');
+    socket.on('disconnect', () => {
+        console.log('Соеденение разорвано')
+    });
+
+    socket.on('msg', data => {
+        console.log(`Новое сообщение: ${data}`);
+    })
 });
